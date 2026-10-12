@@ -48,6 +48,29 @@ The installer will:
 - Copy `bot.py` to `/root/bot.py`
 - Create and enable a `bot.service` systemd unit so the bot runs 24/7 and restarts on failure or reboot
 
+After the installer finishes, copy the `commands/` folder next to the bot and restart it:
+
+```bash
+sudo cp -r commands /root/commands
+sudo systemctl restart bot
+```
+
+> If `commands/` is missing, the bot still starts and falls back to its built-in `!manage` panel.
+
+## 🗂️ Project Structure
+
+```
+vps-bot/
+├── bot.py              # core bot (database, LXC helpers, built-in commands)
+├── install.sh          # installer
+├── logo.png
+└── commands/           # extra commands, auto-loaded on start
+    ├── __init__.py
+    └── manage.py       # !manage control panel (button layout)
+```
+
+To add commands, drop another `.py` file into `commands/` with an `async def setup(bot)` function. Files starting with `_` are skipped.
+
 ## 🛠️ Managing the Bot
 
 | Action            | Command                      |
@@ -76,12 +99,25 @@ sudo systemctl restart bot
 | `VPS_USER_ROLE_ID`     | Role ID granted to VPS owners                                            | —            |
 | `DEFAULT_STORAGE_POOL` | LXD storage pool name                                                    | `default`    |
 | `LOGO_URL`             | Public image link for the logo shown in embeds                           | LightCloud logo |
+| `CPANEL_URL`           | Link opened by the **cPanel** button (leave empty to disable)            | —            |
+| `USER_CAN_DELETE`      | `1` lets VPS owners use **Delete VPS**, `0` makes it admin-only          | `1`          |
 
 Set the hosting name like this:
 
 ```ini
 Environment="BOT_NAME=LightCloud"
 ```
+
+## 🎛️ !manage Panel
+
+Run `!manage` to open the VPS control panel:
+
+| Row | Buttons |
+| --- | ------- |
+| 1 | Reinstall • Start • Stop • Restart • Stats |
+| 2 | Network • Console Logs • Backup • Password • File Manager |
+| 3 | SSH • SSHX • Tunnel • VPS Console • cPanel |
+| 4 | Health Check • Change Password • Delete VPS • Refresh |
 
 ## 👑 Admin Management
 
